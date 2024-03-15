@@ -1,4 +1,4 @@
-import { Items } from "../App";
+import { Items } from "../types";
 
 // Получать уникальные значение массива по code
 export function getUniqeItems(items: Items[]) {

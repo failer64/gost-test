@@ -1,27 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { Card, Modal, Select } from "antd";
-import { useForm } from "react-hook-form";
 import { Item } from "./components/item";
-import "./App.scss";
 import { getUniqeItems } from "./heplers";
 import { Preloader } from "./components/preloader";
-
-export interface Items {
-  code: string;
-  name: string;
-  price: number;
-}
-
-interface FormDataType {
-  name: string;
-  description: string;
-  select: Items[];
-}
-
-interface DataType {
-  query: string;
-  results: string[];
-}
+import { Items, DataType } from "./types";
+import "./App.scss";
 
 function App() {
   const [items, setItems] = useState<Items[]>([]);
@@ -40,23 +23,17 @@ function App() {
 
   const totalPrice = activeItems.reduce((sum, cur) => sum + cur.price, 0);
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm<FormDataType>({
-    mode: "onBlur",
-  });
-
   useEffect(() => {
+    setIsFetching(true);
     fetch("https://gostassistent.ru/api/oks")
       .then((res) => res.json())
-      .then((data) => setItems(data));
+      .then((data) => setItems(data))
+      .finally(() => setIsFetching(false));
   }, []);
 
-  const onSubmit = (data: FormDataType) => {
-    const { name, description } = data;
-    console.log(name, description, select);
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(name, text, select);
     setIsOpen(true);
   };
 
@@ -88,6 +65,8 @@ function App() {
           }
         })
         .finally(() => setIsFetching(false));
+    } else {
+      setIsFetching(false);
     }
   };
 
@@ -121,38 +100,20 @@ function App() {
 
   return (
     <Card>
-      <form onSubmit={handleSubmit(onSubmit)} className={"form"}>
+      <form onSubmit={onSubmit} className={"form"}>
         <div className={"item"}>
           <label htmlFor="name" className={"label"}>
             Название объявления
           </label>
           <input
-            className={errors.name && "input"}
-            id="name"
-            {...register("name", {
-              required: "Введите Название",
-            })}
+            required
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          {errors.name && (
-            <span className={"error"}>{errors.name.message}</span>
-          )}
         </div>
         <div className={"item"}>
           <label htmlFor="description">Текст объявления</label>
-          <textarea
-            value={text}
-            className={errors.description && "input"}
-            id="description"
-            {...register("description", {
-              required: "Введите Описание",
-            })}
-            onChange={(e) => setText(e.target.value)}
-          />
-          {errors.description && (
-            <span className={"error"}>{errors.description.message}</span>
-          )}
+          <textarea value={text} onChange={(e) => setText(e.target.value)} />
         </div>
         <div className={"item"}>
           <button
@@ -168,40 +129,14 @@ function App() {
           <label htmlFor="select">
             Список ОКС (Общероссийский классификатор стандартов)
           </label>
-          {/* <select
-	            multiple
-	            id="select"
-	            {...register("select", {
-	              required:
-	                "Для размещения объявления, выберите хотя бы один раздел ОКС",
-	            })}
-	            value={select}
-	            onChange={(e) => handleChangeSelect(e)}
-	          >
-	            {!!items.length &&
-	              items.map((o) => (
-	                <option id={o.code} value={o.name}>
-	                  {o.name}
-	                </option>
-	              ))}
-	          </select> */}
           <Select
-            //{...register("select", {
-            //required:
-            //"Для размещения объявления, выберите хотя бы один раздел ОКС",
-            //})}
             id="select"
             mode="multiple"
             value={select}
-            //value={activeItems}
-            style={{ width: "100%" }}
-            //onChange={setSelect}
+            style={{ maxWidth: "500px" }}
             onChange={handleChangeSelect}
-            //disabled={loading}
             placeholder={"Выберите фильтр"}
             allowClear
-            //showSearch={false}
-            //options={options}
           >
             {items.map((item) => (
               <Select.Option value={item.name} key={item.code}>
@@ -209,9 +144,6 @@ function App() {
               </Select.Option>
             ))}
           </Select>
-          {/* {errors.select && (
-	            <span className={"error"}>{errors.select.message}</span>
-	          )} */}
         </div>
         <div className={"item"}>
           <button disabled={!activeItems.length} className={"button"}>
@@ -229,7 +161,9 @@ function App() {
           </span>
         </>
       ) : (
-        <span>Для размещения объявления, выберите хотя бы один раздел ОКС</span>
+        <span className="error">
+          Для размещения объявления, выберите хотя бы один раздел ОКС
+        </span>
       )}
       <Modal
         title={`Ваше объявление "${name}" успешно размещено!`}

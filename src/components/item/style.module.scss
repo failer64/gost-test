@@ -1,32 +1,27 @@
 .item {
-	transition: all 0.3s ease 0s;
 	display: flex;
+	align-items: center;
 	font-size: 1rem;
-	height: auto;
-
-	&:not(:last-child) {
-		padding: 0px 0px 0.5rem 0px;
-		margin-bottom: 1rem;
-		border-bottom: 1px solid #343434;
-	}
 }
 
 .code {}
 
 .name {
 	flex: 1 1 auto;
+	padding: 0 0.5rem;
 	text-align: center;
 }
 
 .price {
 	font-weight: 700;
+	white-space: nowrap;
 }
 
 .delete {
 	font-size: 1.5rem;
-	height: 1.5rem;
-	width: 1.5rem;
-	flex: 0 0 1.5rem;
+	height: 20px;
+	width: 20px;
+	flex: 0 0 20px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -40,5 +35,11 @@
 		&:hover {
 			background-color: #d4cbcb49;
 		}
+	}
+}
+
+@media (max-width: 480px) {
+	.item {
+		font-size: 0.825rem;
 	}
 }

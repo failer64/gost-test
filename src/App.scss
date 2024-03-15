@@ -1,7 +1,7 @@
 #root {
 	max-width: 1280px;
 	margin: 0 auto;
-	padding: 2rem 0;
+	padding: 2rem 0.6rem;
 }
 
 .body {
@@ -12,8 +12,6 @@
 }
 
 .form {
-	width: 800px;
-
 	&:not(:last-child) {
 		margin-bottom: 1.5rem
 	}
@@ -43,6 +41,7 @@ textarea {
 	resize: vertical;
 	padding: 1rem;
 	min-height: 100px;
+	max-height: 300px;
 }
 
 .item {
@@ -61,10 +60,6 @@ textarea {
 			margin-bottom: 0.5em;
 		}
 	}
-}
-
-.input {
-	border: 1px solid #ff6161;
 }
 
 .error {
@@ -95,5 +90,17 @@ textarea {
 		&:hover {
 			background-color: #3b146e;
 		}
+	}
+}
+
+@media (min-width: 900px) {
+	.form {
+		width: 800px;
+	}
+}
+
+@media (max-width: 480px) {
+	.ant-card-body {
+		padding: 1rem !important;
 	}
 }
